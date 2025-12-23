@@ -1,17 +1,24 @@
 package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.Result;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -38,8 +45,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
-        //密码比对
-        // TODO 后期需要进行md5加密，然后再进行比对
+        // 密码进行 MD5 加密
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -54,4 +62,47 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    @Override
+    public Result save(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+
+        // 复制对象属性
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+
+        // 设置默认密码
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+
+        // 设置其余属性
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setCreateTime(LocalDateTime.now());
+
+        Long currentId = BaseContext.getCurrentId();
+        employee.setUpdateUser(currentId);
+        employee.setUpdateUser(currentId);
+
+        employee.setStatus(StatusConstant.ENABLE);
+
+        employeeMapper.insert(employee);
+        return Result.success();
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
