@@ -1,16 +1,20 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -63,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Result save(EmployeeDTO employeeDTO) {
+    public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
 
         // 复制对象属性
@@ -84,7 +90,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus(StatusConstant.ENABLE);
 
         employeeMapper.insert(employee);
-        return Result.success();
+
+    }
+
+    /**
+     * 分页查询员工信息
+     * @param queryDTO
+     * @return
+     */
+    @Override
+    public PageResult pageQuery(EmployeePageQueryDTO queryDTO) {
+
+        // 组装分页功能
+        int pageNum = queryDTO.getPage();
+        int pageSize = queryDTO.getPageSize();
+        PageHelper.startPage(pageNum, pageSize);
+
+        Page<Employee> result = employeeMapper.pageQuery(queryDTO.getName());
+
+        List<Employee> list = result.getResult();
+        long total = result.getTotal();
+
+        return new PageResult(total, list);
     }
 
 }
