@@ -28,4 +28,18 @@ public interface EmployeeMapper {
     void insert(Employee employee);
 
     Page<Employee> pageQuery(String name);
+
+    /**
+     * 根据主键修改用户
+     * @param employee
+     */
+    void update(Employee employee);
+
+    /**
+     * 根据 id 查询员工
+     * @param id
+     * @return
+     */
+    @Select("SELECT * FROM employee WHERE id = #{id}")
+    Employee getById(Long id);
 }
