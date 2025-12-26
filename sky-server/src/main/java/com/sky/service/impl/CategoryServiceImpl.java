@@ -7,8 +7,12 @@ import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.exception.BaseException;
 import com.sky.mapper.CategoryMapper;
+import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
+import com.sky.result.Result;
 import com.sky.service.CategoryService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private CategoryMapper categoryMapper;
 
+    @Resource
+    private DishMapper dishMapper;
+
+    @Resource
+    private SetmealMapper setmealMapper;
+
     /**
      * 新增菜品分类方法
      * @param categoryDTO
@@ -36,7 +46,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO, category);
 
-        // TODO 设置其余属性
         // 默认禁用菜品分类状态
         category.setStatus(StatusConstant.DISABLE);
         // 初始化创建时间和更新时间
@@ -104,13 +113,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
+     * 根据分类id删除分类
      * @param id
      */
     @Override
-    public void deleteById(Long id) {
-        // TODO 查询分类是否含有套餐或菜品
+    public Result deleteById(Long id) {
 
-
+        Category category = categoryMapper.getById(id);
+        if (category == null) {
+            throw new BaseException("分类id为空");
+        }
+        Long categoryId = category.getId();
+        int count = 0;
+        if (categoryId == 1) {
+            // 查询菜品数量
+            count = dishMapper.getCountByCategoryId(categoryId);
+        } else if (categoryId == 2) {
+            // 差评套餐数量
+            count = setmealMapper.getCountByCategoryId(categoryId);
+        }
+        if (count != 0) {
+            return Result.error("删除失败，分类下不为空");
+        }
         categoryMapper.deleteById(id);
+        return Result.success();
     }
 }

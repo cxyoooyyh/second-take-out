@@ -15,12 +15,25 @@ import org.springframework.web.bind.annotation.DeleteMapping;
  */
 @Mapper
 public interface CategoryMapper {
+    /**
+     * 插入一条分类数据
+     * @param category
+     */
     @Insert("INSERT INTO category (type, name, sort, status, create_time, update_time, create_user, update_user) VALUES " +
             "(#{type}, #{name}, #{sort}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})")
     void save(Category category);
 
+    /**
+     * 分页查询 分类
+     * @param queryDTO
+     * @return
+     */
     Page<Category> page(CategoryPageQueryDTO queryDTO);
 
+    /**
+     * 更新 分类数据
+     * @param category
+     */
     void update(Category category);
 
     /*
@@ -29,4 +42,12 @@ public interface CategoryMapper {
      */
     @Delete("DELETE FROM category WHERE id = #{id}")
     void deleteById(Long id);
+
+    /**
+     * 根据id查询分类
+     * @param id
+     * @return
+     */
+    @Select("SELECT * FROM category where id = #{id}")
+    Category getById(Long id);
 }
