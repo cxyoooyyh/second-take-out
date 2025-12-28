@@ -2,12 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
 import com.sky.exception.BaseException;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 
 
         // 调用 Mapper 映射层方法添加
-        categoryMapper.save(category);
+        categoryMapper.insert(category);
     }
 
     /**
@@ -67,11 +70,11 @@ public class CategoryServiceImpl implements CategoryService {
      * @return
      */
     @Override
-    public PageResult page(CategoryPageQueryDTO queryDTO) {
+    public PageResult pageQuery(CategoryPageQueryDTO queryDTO) {
         PageHelper.startPage(queryDTO.getPage(), queryDTO.getPageSize());
 
         // 调用Mapper层分页查询方法
-        Page<Category> page = categoryMapper.page(queryDTO);
+        Page<Category> page = categoryMapper.pageQuery(queryDTO);
 
         //封装PageResult对象
         List<Category> result = page.getResult();
@@ -86,12 +89,12 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public void startOrStop(Integer status, Long id) {
-
         Category category = Category.builder()
                 .status(status)
-                .id(id).build();
-        category.setUpdateUser(BaseContext.getCurrentId());
-        category.setUpdateTime(LocalDateTime.now());
+                .id(id)
+                .updateUser(BaseContext.getCurrentId())
+                .updateTime(LocalDateTime.now())
+                .build();
         // 更新 菜品分类 数据
         categoryMapper.update(category);
     }
@@ -117,25 +120,44 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id
      */
     @Override
-    public Result deleteById(Long id) {
+    public void deleteById(Long id) {
 
-        Category category = categoryMapper.getById(id);
-        if (category == null) {
-            throw new BaseException("分类id为空");
+        // 查询当前分类是否关联了菜品，如果关联则删除失败
+        Integer count = dishMapper.countByCategoryId(id);
+
+        if (count > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }
-        Long categoryId = category.getId();
-        int count = 0;
-        if (categoryId == 1) {
-            // 查询菜品数量
-            count = dishMapper.getCountByCategoryId(categoryId);
-        } else if (categoryId == 2) {
-            // 差评套餐数量
-            count = setmealMapper.getCountByCategoryId(categoryId);
+
+        // 查询当前分类是否关联了套餐
+        count = setmealMapper.countByCategoryId(id);
+
+        if (count > 0) {
+            throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
         }
-        if (count != 0) {
-            return Result.error("删除失败，分类下不为空");
-        }
+
+        // 根据 id 删除分类
         categoryMapper.deleteById(id);
-        return Result.success();
+    }
+
+    /**
+     * 根据类型获取分类列表
+     * @param type
+     * @return
+     */
+    @Override
+    public List<Category> getListByType(Integer type) {
+        return categoryMapper.getListByType(type);
     }
 }
+
+
+
+
+
+
+
+
+
+
+

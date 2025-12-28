@@ -8,6 +8,9 @@
             <if test="name != null and name != ''">
                 name = #{name},
             </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
             <if test="sort != null">
                 sort = #{sort},
             </if>
@@ -25,7 +28,7 @@
             id = #{id}
     </update>
 
-    <select id="page" resultType="com.sky.entity.Category" parameterType="com.sky.dto.CategoryPageQueryDTO">
+    <select id="pageQuery" resultType="com.sky.entity.Category" parameterType="com.sky.dto.CategoryPageQueryDTO">
         SELECT * FROM category
         <where>
             <if test="name != null and name != ''">
@@ -35,6 +38,16 @@
                 type = #{type}
             </if>
         </where>
-        order by sort desc
+        order by sort asc, create_time desc
+    </select>
+
+
+    <select id="getListByType" resultType="com.sky.entity.Category">
+        SELECT * FROM category
+        where status = 1
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        order by sort asc, create_time desc
     </select>
 </mapper>

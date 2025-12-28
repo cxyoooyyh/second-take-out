@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author sharkCode
@@ -35,7 +36,7 @@ public class CategoryController {
     @GetMapping("/page")
     @ApiOperation("分页查询菜品分类")
     public Result<PageResult> page(CategoryPageQueryDTO queryDTO) {
-        PageResult pageResult = categoryService.page(queryDTO);
+        PageResult pageResult = categoryService.pageQuery(queryDTO);
         return Result.success(pageResult);
     }
 
@@ -54,14 +55,17 @@ public class CategoryController {
     @DeleteMapping
     @ApiOperation("根据id删除分类")
     public Result deleteById(Long id) {
-        return categoryService.deleteById(id);
-    }
+        categoryService.deleteById(id);
+        return Result.success();
+   }
+
+   @GetMapping("/list")
+   @ApiOperation("根据类型查询分类")
+   public Result<List<Category>> getListByType(Integer type) {
+        List<Category> list = categoryService.getListByType(type);
+        return Result.success(list);
+   }
 }
-
-
-
-
-
 
 
 

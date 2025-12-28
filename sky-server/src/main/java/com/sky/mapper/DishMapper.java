@@ -4,6 +4,11 @@ import org.apache.ibatis.annotations.Select;
 
 public interface DishMapper {
 
-    @Select("SELECT count(*) FROM dish WHERE category_id = #{categoryId}")
-    int getCountByCategoryId(Long categoryId);
+    /**
+     * 根据分类id查询菜品数量
+     * @param categoryId
+     * @return
+     */
+    @Select("SELECT count(id) FROM dish WHERE category_id = #{categoryId}")
+    Integer countByCategoryId(Long categoryId);
 }

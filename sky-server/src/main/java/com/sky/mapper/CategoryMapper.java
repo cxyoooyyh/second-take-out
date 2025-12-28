@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import java.util.List;
+
 /**
  * @author sharkCode
  * @date 2025/12/25 20:43
@@ -21,14 +23,14 @@ public interface CategoryMapper {
      */
     @Insert("INSERT INTO category (type, name, sort, status, create_time, update_time, create_user, update_user) VALUES " +
             "(#{type}, #{name}, #{sort}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})")
-    void save(Category category);
+    void insert(Category category);
 
     /**
      * 分页查询 分类
      * @param queryDTO
      * @return
      */
-    Page<Category> page(CategoryPageQueryDTO queryDTO);
+    Page<Category> pageQuery(CategoryPageQueryDTO queryDTO);
 
     /**
      * 更新 分类数据
@@ -50,4 +52,11 @@ public interface CategoryMapper {
      */
     @Select("SELECT * FROM category where id = #{id}")
     Category getById(Long id);
+
+    /**
+     * 根据类型查询分类列表
+     * @param type
+     * @return
+     */
+    List<Category> getListByType(Integer type);
 }
