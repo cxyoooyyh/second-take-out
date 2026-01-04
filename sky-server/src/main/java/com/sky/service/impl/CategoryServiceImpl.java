@@ -51,14 +51,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         // 默认禁用菜品分类状态
         category.setStatus(StatusConstant.DISABLE);
-        // 初始化创建时间和更新时间
-        category.setCreateTime(LocalDateTime.now());
-        category.setUpdateTime(LocalDateTime.now());
-        // 初始化创建人和修改人
-        Long currentId = BaseContext.getCurrentId();
-        category.setCreateUser(currentId);
-        category.setUpdateUser(currentId);
-
 
         // 调用 Mapper 映射层方法添加
         categoryMapper.insert(category);
@@ -92,8 +84,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = Category.builder()
                 .status(status)
                 .id(id)
-                .updateUser(BaseContext.getCurrentId())
-                .updateTime(LocalDateTime.now())
                 .build();
         // 更新 菜品分类 数据
         categoryMapper.update(category);
@@ -108,8 +98,6 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO, category);
 
-        category.setUpdateUser(BaseContext.getCurrentId());
-        category.setUpdateTime(LocalDateTime.now());
 
         // 更新 菜品分类 数据
         categoryMapper.update(category);
