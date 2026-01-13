@@ -22,4 +22,6 @@ public interface DishService {
     void updateWithFlavor(DishDTO dishDTO);
 
     void deleteBatch(List<Long> ids);
+
+    List<DishVO> listWithFlavor(Dish dish);
 }

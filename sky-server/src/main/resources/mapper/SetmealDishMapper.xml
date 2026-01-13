@@ -24,9 +24,5 @@
         SELECT * FROM setmeal_dish WHERE setmeal_id = #{id}
     </select>
 
-    <!--根据套餐id 查询 菜品列表数据-->
-    <select id="getBySetmealId" resultType="com.sky.entity.Dish">
-        SELECT d.* FROM setmeal_dish sd LEFT JOIN dish d ON sd.dish_id = d.id
-        WHERE sd.setmeal_id = #{id}
-    </select>
+
 </mapper>

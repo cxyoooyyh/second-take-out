@@ -65,4 +65,24 @@
         </where>
         ORDER BY create_time DESC
     </select>
+    <!--根据套餐id 查询 菜品列表数据-->
+    <select id="getBySetmealId" resultType="com.sky.entity.Dish">
+        SELECT d.* FROM setmeal_dish sd LEFT JOIN dish d ON sd.dish_id = d.id
+        WHERE sd.setmeal_id = #{id}
+    </select>
+
+    <select id="list" resultType="com.sky.entity.Dish">
+        SELECT * FROM dish d
+        <where>
+            <if test="name != null and name != ''">
+                AND d.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                AND d.status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND d.category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
 </mapper>
