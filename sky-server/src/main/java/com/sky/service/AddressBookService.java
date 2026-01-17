@@ -1,0 +1,21 @@
+package com.sky.service;
+
+import com.sky.entity.AddressBook;
+
+import java.util.List;
+
+public interface AddressBookService {
+    void save(AddressBook addressBook);
+
+    AddressBook getById(Long id);
+
+    void deleteById(Long id);
+
+    void update(AddressBook addressBook);
+
+    void setDefault(AddressBook addressBook);
+
+    AddressBook getDefault();
+
+    List<AddressBook> list();
+}

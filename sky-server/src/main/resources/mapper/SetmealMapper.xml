@@ -61,4 +61,13 @@
             </if>
         </where>
     </select>
+    <!--  条件查询数量  -->
+    <select id="countByMap" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM setmeal
+        <where>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>
